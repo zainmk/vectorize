@@ -1,0 +1,212 @@
+[
+  {
+    "id": "1",
+    "title": "The Matrix",
+    "year": 1999,
+    "genre": "Sci-Fi / Action",
+    "description": "A computer programmer discovers that reality is an elaborate simulation created by machines, and joins an underground rebellion to fight for humanity's freedom."
+  },
+  {
+    "id": "2",
+    "title": "Inception",
+    "year": 2010,
+    "genre": "Sci-Fi / Thriller",
+    "description": "A skilled thief who specializes in stealing secrets from people's dreams is tasked with planting an idea into a CEO's mind, blurring the line between dreams and reality."
+  },
+  {
+    "id": "3",
+    "title": "The Notebook",
+    "year": 2004,
+    "genre": "Romance / Drama",
+    "description": "A poor young man falls deeply in love with a rich girl in 1940s South Carolina, but their different social classes threaten to keep them apart forever."
+  },
+  {
+    "id": "4",
+    "title": "Get Out",
+    "year": 2017,
+    "genre": "Horror / Thriller",
+    "description": "A Black man visits his white girlfriend's family estate and gradually uncovers a disturbing secret tied to racism and mind control."
+  },
+  {
+    "id": "5",
+    "title": "Toy Story",
+    "year": 1995,
+    "genre": "Animation / Family",
+    "description": "When a new space-ranger action figure arrives, a cowboy doll feels threatened and the two toys must work together to escape and return home to their owner."
+  },
+  {
+    "id": "6",
+    "title": "Interstellar",
+    "year": 2014,
+    "genre": "Sci-Fi / Drama",
+    "description": "A former NASA pilot travels through a wormhole near Saturn to find a new habitable planet for humanity as Earth's ecosystem collapses, leaving his family behind."
+  },
+  {
+    "id": "7",
+    "title": "Parasite",
+    "year": 2019,
+    "genre": "Thriller / Drama",
+    "description": "A poor Korean family cons their way into employment with a wealthy household, setting off an unexpected chain of events exposing the brutal divide between classes."
+  },
+  {
+    "id": "8",
+    "title": "The Shining",
+    "year": 1980,
+    "genre": "Horror",
+    "description": "A writer takes a job as winter caretaker of an isolated hotel, where supernatural forces and his own demons drive him to violence while his psychic son sees terrifying visions."
+  },
+  {
+    "id": "9",
+    "title": "Mad Max: Fury Road",
+    "year": 2015,
+    "genre": "Action / Sci-Fi",
+    "description": "In a post-apocalyptic wasteland a woman defects from a tyrannical warlord and flees across a desert in a war rig, forming an unlikely alliance with a drifter."
+  },
+  {
+    "id": "10",
+    "title": "Eternal Sunshine of the Spotless Mind",
+    "year": 2004,
+    "genre": "Romance / Sci-Fi",
+    "description": "After a painful breakup, a couple independently undergoes a procedure to erase all memories of each other, but one of them begins to have second thoughts mid-erasure."
+  },
+  {
+    "id": "11",
+    "title": "The Lion King",
+    "year": 1994,
+    "genre": "Animation / Family",
+    "description": "A young lion prince flees his kingdom after his uncle murders his father, but years later must return to challenge his uncle and reclaim his rightful throne."
+  },
+  {
+    "id": "12",
+    "title": "Whiplash",
+    "year": 2014,
+    "genre": "Drama / Music",
+    "description": "An ambitious young jazz drummer at an elite conservatory is pushed to his psychological and physical limits by a ruthless, abusive instructor obsessed with greatness."
+  },
+  {
+    "id": "13",
+    "title": "Alien",
+    "year": 1979,
+    "genre": "Sci-Fi / Horror",
+    "description": "The crew of a commercial space freighter investigates a distress signal on a desolate moon and encounters a deadly extraterrestrial organism that hunts them one by one."
+  },
+  {
+    "id": "14",
+    "title": "La La Land",
+    "year": 2016,
+    "genre": "Romance / Musical",
+    "description": "An aspiring actress and a jazz pianist fall in love in Los Angeles while chasing their individual dreams, ultimately facing a choice between love and ambition."
+  },
+  {
+    "id": "15",
+    "title": "John Wick",
+    "year": 2014,
+    "genre": "Action / Thriller",
+    "description": "A retired hitman seeks brutal revenge against the gangster son who killed his dog — the last gift from his recently deceased wife — and stole his prized car."
+  },
+  {
+    "id": "16",
+    "title": "Spirited Away",
+    "year": 2001,
+    "genre": "Animation / Fantasy",
+    "description": "A 10-year-old girl stumbles into a magical spirit world and must work in a bathhouse to save her parents who were transformed into pigs by a powerful witch."
+  },
+  {
+    "id": "17",
+    "title": "The Social Network",
+    "year": 2010,
+    "genre": "Drama / Biography",
+    "description": "The cutthroat founding of Facebook is dramatized through simultaneous legal depositions, exploring betrayal, ambition, and the price of building a billion-dollar empire."
+  },
+  {
+    "id": "18",
+    "title": "A Quiet Place",
+    "year": 2018,
+    "genre": "Horror / Thriller",
+    "description": "A family struggles to survive in a post-apocalyptic world overrun by blind monsters with hypersensitive hearing, forced to live in near-total silence."
+  },
+  {
+    "id": "19",
+    "title": "The Grand Budapest Hotel",
+    "year": 2014,
+    "genre": "Comedy / Drama",
+    "description": "A legendary concierge and his young protégé become embroiled in a murder mystery and the theft of a priceless painting in a quirky European mountain resort."
+  },
+  {
+    "id": "20",
+    "title": "Gravity",
+    "year": 2013,
+    "genre": "Sci-Fi / Thriller",
+    "description": "Two astronauts are stranded in space after their shuttle is destroyed by debris, and must survive using minimal resources while facing the vast emptiness of orbit."
+  },
+  {
+    "id": "21",
+    "title": "Her",
+    "year": 2013,
+    "genre": "Romance / Sci-Fi",
+    "description": "A lonely writer in the near future develops a deep romantic relationship with an AI operating system that has a warm, evolving personality and no physical form."
+  },
+  {
+    "id": "22",
+    "title": "The Dark Knight",
+    "year": 2008,
+    "genre": "Action / Crime",
+    "description": "Batman faces his greatest adversary when a sadistic anarchist criminal known as the Joker plunges Gotham City into chaos, forcing impossible moral choices."
+  },
+  {
+    "id": "23",
+    "title": "Midsommar",
+    "year": 2019,
+    "genre": "Horror / Folk",
+    "description": "A grieving woman accompanies her boyfriend and his friends to a Swedish midsummer festival that turns into a nightmarish pagan ritual in broad daylight."
+  },
+  {
+    "id": "24",
+    "title": "Good Will Hunting",
+    "year": 1997,
+    "genre": "Drama",
+    "description": "A young janitor at MIT is secretly a mathematical genius who must confront his troubled past with the help of a compassionate therapist and a supportive professor."
+  },
+  {
+    "id": "25",
+    "title": "Everything Everywhere All at Once",
+    "year": 2022,
+    "genre": "Sci-Fi / Comedy / Drama",
+    "description": "A middle-aged Chinese-American laundromat owner discovers she must access skills from parallel universes to stop a nihilistic force threatening all of existence."
+  },
+  {
+    "id": "26",
+    "title": "Apocalypse Now",
+    "year": 1979,
+    "genre": "War / Drama",
+    "description": "During the Vietnam War, a special operations officer travels deep into the jungle on a secret mission to assassinate a rogue colonel who has gone completely mad."
+  },
+  {
+    "id": "27",
+    "title": "Hereditary",
+    "year": 2018,
+    "genre": "Horror",
+    "description": "After their grandmother dies, a family begins to unravel as terrifying supernatural events escalate and dark family secrets tied to an occult cult are revealed."
+  },
+  {
+    "id": "28",
+    "title": "The Truman Show",
+    "year": 1998,
+    "genre": "Drama / Sci-Fi",
+    "description": "An insurance salesman gradually discovers that his entire life has been a live TV show broadcast to millions, and every person he knows is an actor."
+  },
+  {
+    "id": "29",
+    "title": "Princess Mononoke",
+    "year": 1997,
+    "genre": "Animation / Fantasy",
+    "description": "A young prince becomes embroiled in a fierce war between ancient forest gods and a human settlement that is mining the land, trying to broker peace between them."
+  },
+  {
+    "id": "30",
+    "title": "Blade Runner 2049",
+    "year": 2017,
+    "genre": "Sci-Fi / Noir",
+    "description": "A new blade runner uncovers a long-buried secret that could plunge society into chaos, leading him to search for a missing former blade runner who vanished decades ago."
+  }
+]

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semantic Movie Search</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a24;
+      --surface2: #22222f;
+      --border: #2e2e3f;
+      --accent: #7c6af5;
+      --accent-dim: #4a418f;
+      --text: #e8e8f0;
+      --text-dim: #888899;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #f87171;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      max-width: 760px;
+      margin: 0 auto 2.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      margin-top: 0.5rem;
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.25rem 0.65rem;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .search-box {
+      max-width: 760px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .search-row input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-row input:focus { border-color: var(--accent); }
+    .search-row input::placeholder { color: var(--text-dim); }
+
+    .search-row button {
+      padding: 0.75rem 1.4rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .search-row button:hover { opacity: 0.85; }
+    .search-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+    }
+
+    .example-chip {
+      padding: 0.3rem 0.7rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .example-chip:hover { color: var(--accent); border-color: var(--accent); }
+
+    .results-meta {
+      max-width: 760px;
+      margin: 0 auto 1rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      min-height: 1.2em;
+    }
+
+    .results-meta strong { color: var(--text); }
+
+    .results {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.25rem 1rem;
+      align-items: start;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 0.15rem;
+    }
+
+    .card-desc {
+      font-size: 0.875rem;
+      color: #b0b0c8;
+      line-height: 1.55;
+      margin-top: 0.5rem;
+      grid-column: 1;
+    }
+
+    .card-desc strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .similarity-badge {
+      grid-row: 1 / 2;
+      align-self: start;
+      padding: 0.25rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .sim-high   { background: #14532d; color: var(--green); }
+    .sim-medium { background: #422006; color: var(--yellow); }
+    .sim-low    { background: #450a0a; color: var(--red); }
+
+    .loader {
+      max-width: 760px;
+      margin: 2rem auto;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      max-width: 760px;
+      margin: 3rem auto;
+      text-align: center;
+      color: var(--text-dim);
+    }
+
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+    .how-it-works {
+      max-width: 760px;
+      margin: 3rem auto 0;
+      padding: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .how-it-works h3 { color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem; }
+
+    .how-it-works .step {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+      align-items: baseline;
+    }
+
+    .step-num {
+      min-width: 1.4rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .data-section {
+      max-width: 960px;
+      margin: 3rem auto 0;
+    }
+
+    .data-section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    .data-section h2 span { color: var(--accent); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    thead th {
+      background: var(--surface2);
+      color: var(--text-dim);
+      text-align: left;
+      padding: 0.6rem 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    tbody td {
+      padding: 0.6rem 0.9rem;
+      vertical-align: top;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .col-id   { color: var(--text-dim); width: 2.5rem; text-align: center; }
+    .col-year { color: var(--text-dim); white-space: nowrap; }
+    .col-genre { white-space: nowrap; }
+    .col-title { font-weight: 600; white-space: nowrap; }
+    .col-desc  { color: #b0b0c8; min-width: 260px; }
+
+    footer {
+      max-width: 760px;
+      margin: 2rem auto 0;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #444458;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1> vectorize | <span> Semantic Search </span></h1>
+  <p>Search 30 films by meaning — not keywords.<br>Powered by vector embeddings and cosine similarity.</p>
+  <span class="badge"> ChromaDB · all-MiniLM-L6-v2 · FastAPI </span>
+</header>
+
+<div class="search-box">
+  <div class="search-row">
+    <input id="query" type="text" placeholder="e.g. a man battles his inner demons, space survival…" autofocus />
+    <button id="searchBtn" onclick="runSearch()">Search</button>
+  </div>
+  <div class="examples">
+    <span class="label" style="font-size:0.8rem;color:var(--text-dim);align-self:center;">try:</span>
+    <span class="example-chip" onclick="setQuery(this)">love across social classes</span>
+    <span class="example-chip" onclick="setQuery(this)">terrifying creatures in the dark</span>
+    <span class="example-chip" onclick="setQuery(this)">escaping from a simulation</span>
+    <span class="example-chip" onclick="setQuery(this)">animated adventure for children</span>
+    <span class="example-chip" onclick="setQuery(this)">war and the loss of humanity</span>
+    <span class="example-chip" onclick="setQuery(this)">musician chasing perfection</span>
+    <span class="example-chip" onclick="setQuery(this)">post-apocalyptic survival</span>
+    <span class="example-chip" onclick="setQuery(this)">AI and loneliness</span>
+  </div>
+</div>
+
+<div id="meta" class="results-meta"></div>
+<div id="results" class="results"></div>
+
+<!-- <div class="how-it-works">
+  <h3>How this works</h3>
+  <div class="step"><span class="step-num">1.</span><span>Each movie description is encoded into a 384-dimensional vector using <strong>sentence-transformers/all-MiniLM-L6-v2</strong> at startup.</span></div>
+  <div class="step"><span class="step-num">2.</span><span>Vectors are stored in a numpy float32 matrix — this is exactly what a vector database does under the hood. Embeddings are L2-normalised so cosine similarity reduces to a dot product.</span></div>
+  <div class="step"><span class="step-num">3.</span><span>Your query is embedded with the same model. ChromaDB finds the closest movie vectors using <strong>cosine similarity</strong> — capturing semantic meaning, not just word overlap.</span></div>
+  <div class="step"><span class="step-num">4.</span><span>Results are ranked by similarity score. Try queries that don't share words with any title or description to see semantic understanding in action.</span></div>
+</div> -->
+
+<div class="data-section">
+  <h2>Raw Dataset &nbsp;<span>30 movies</span></h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-id">#</th>
+          <th class="col-title">Title</th>
+          <th class="col-year">Year</th>
+          <th class="col-genre">Genre</th>
+          <th class="col-desc">Description</th>
+        </tr>
+      </thead>
+      <tbody id="moviesTableBody">
+        <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:1.5rem">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>30 films · embeddings computed locally · no external API calls</footer>
+
+<script>
+  const input = document.getElementById('query');
+  const resultsEl = document.getElementById('results');
+  const metaEl = document.getElementById('meta');
+
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+
+  function setQuery(chip) {
+    input.value = chip.textContent;
+    input.focus();
+    runSearch();
+  }
+
+  function simClass(score) {
+    if (score >= 55) return 'sim-high';
+    if (score >= 35) return 'sim-medium';
+    return 'sim-low';
+  }
+
+  async function runSearch() {
+    const query = input.value.trim();
+
+    if (!query) return;
+
+    const btn = document.getElementById('searchBtn');
+    btn.disabled = true;
+    resultsEl.innerHTML = '<div class="loader"><span class="spinner"></span>Searching…</div>';
+    metaEl.innerHTML = '';
+
+    try {
+      const res = await fetch('/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+
+      if (!data.results?.length) {
+        resultsEl.innerHTML = '<div class="empty-state"><div class="icon">🎬</div><p>No results found.</p></div>';
+        return;
+      }
+
+      metaEl.innerHTML = `Top <strong>${data.results.length}</strong> matches for <strong>"${escHtml(data.query)}"</strong>`;
+
+      resultsEl.innerHTML = data.results.map((m, i) => `
+        <div class="card" style="animation-delay:${i * 0.05}s">
+          <div>
+            <div class="card-title">${escHtml(m.title)}</div>
+            <div class="card-meta">${m.year} &nbsp;·&nbsp; ${escHtml(m.genre)}</div>
+          </div>
+          <div class="similarity-badge ${simClass(m.similarity)}">${m.similarity}%</div>
+          <div class="card-desc">${highlightTerms(m.description, data.query)}</div>
+        </div>
+      `).join('');
+
+    } catch (err) {
+      resultsEl.innerHTML = `<div class="loader" style="color:#f87171">Error: ${escHtml(err.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function highlightTerms(text, query) {
+    const terms = query.toLowerCase().match(/\b[a-z]+\b/g) || [];
+    if (!terms.length) return escHtml(text);
+    const escaped = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const pattern = new RegExp(`\\b(${escaped.join('|')})\\b`, 'gi');
+    const parts = [];
+    let last = 0, match;
+    while ((match = pattern.exec(text)) !== null) {
+      parts.push(escHtml(text.slice(last, match.index)));
+      parts.push(`<strong>${escHtml(match[0])}</strong>`);
+      last = match.index + match[0].length;
+    }
+    parts.push(escHtml(text.slice(last)));
+    return parts.join('');
+  }
+
+  async function loadMoviesTable() {
+    const tbody = document.getElementById('moviesTableBody');
+    try {
+      const res = await fetch('movies.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const movies = await res.json();
+      tbody.innerHTML = movies.map(m => `
+        <tr>
+          <td class="col-id">${escHtml(m.id)}</td>
+          <td class="col-title">${escHtml(m.title)}</td>
+          <td class="col-year">${m.year}</td>
+          <td class="col-genre">${escHtml(m.genre)}</td>
+          <td class="col-desc">${escHtml(m.description)}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#f87171;padding:1.5rem">Failed to load movies.json: ${escHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  loadMoviesTable();
+</script>
+</body>
+</html>
