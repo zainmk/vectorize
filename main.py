@@ -4,15 +4,21 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 import json
+import os
 import bm25
 import uvicorn
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print('server init...')
+    print('cwd:', os.getcwd())
+    print('__file__:', __file__)
+    print('BASE_DIR:', BASE_DIR)
     global MOVIES
     global tok_data
-    with open('movies.json') as f:
+    with open(os.path.join(BASE_DIR, 'movies.json')) as f:
         MOVIES = json.load(f)
     tok_data = bm25.build_index(MOVIES)
     yield
@@ -29,11 +35,11 @@ class SearchRequest(BaseModel):
 async def index():
     return 'hello world'
 
-app.mount("/public", StaticFiles(directory="public"), name="public")
+app.mount("/public", StaticFiles(directory=os.path.join(BASE_DIR, "public")), name="public")
 
 @app.get("/app")
 async def index():
-    return FileResponse("public/index.html") # serve the 'frontend' at base url
+    return FileResponse(os.path.join(BASE_DIR, "public/index.html"))
 
 
 @app.post("/search")
