@@ -15,28 +15,9 @@ Dependencies:
 
 import json
 import chromadb
+from sentence_transformers import SentenceTransformer # turns string into vectors
 
-# SentenceTransformer turns text into a fixed-length numeric vector.
-# 'all-MiniLM-L6-v2' is a lightweight but capable model (384 dimensions).
-# It runs entirely locally — no API key or internet required at query time.
-from sentence_transformers import SentenceTransformer
-
-
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
-
-# The sentence-transformer model to use for embedding text.
-# Must be the same model at index time AND query time so vectors are
-# comparable.  Changing this requires deleting CHROMA_PERSIST_DIR and
-# re-indexing.
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-
-
-# ---------------------------------------------------------------------------
-# Step 2 — Build (or reuse) the ChromaDB collection
-# ---------------------------------------------------------------------------
-
 
 def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collection:
     """
