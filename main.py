@@ -37,7 +37,7 @@ async def index():
 @app.get("/app")    
 async def serve_app():
     # return FileResponse(os.path.join(BASE_DIR, "public/index.html"))
-    html_path = os.path.join(os.path.dirname(__file__), ".", "public", "index.html")
+    html_path = os.path.join(os.path.dirname(__file__), "..", "public", "index.html")
     with open(os.path.abspath(html_path)) as f:
         return f.read()
 
