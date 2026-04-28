@@ -67,9 +67,12 @@ async def search(req: SearchRequest):
 
 @app.post("/semanticsearch")
 async def search(req: SearchRequest):
+    
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
+    
     res = semanticsearch(req.query, semantic_collection)
+
     return {"query": req.query, "results": res }
 
 

@@ -1,8 +1,8 @@
 import json
 import chromadb
-from fastembed import TextEmbedding
+from model2vec import StaticModel
 
-EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+EMBEDDING_MODEL = "minishlab/M2V_base_output"
 
 def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collection:
     """
@@ -17,11 +17,9 @@ def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collect
 
     print(f"[semantic] Embedding {len(movies)} movies with '{EMBEDDING_MODEL}'…")
 
-    model = TextEmbedding(EMBEDDING_MODEL)
+    model = StaticModel.from_pretrained(EMBEDDING_MODEL)
     texts = [f"{m['title']}. {m['description']}" for m in movies]
-
-    embeddings = [e.tolist() for e in model.embed(texts)]
-
+    embeddings = model.encode(texts).tolist()
 
     ids = [str(m["id"]) for m in movies]
     metadatas = [
@@ -41,9 +39,9 @@ def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collect
 # Step 3 — Query
 # ---------------------------------------------------------------------------
 
-def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 10) -> list[dict]:
-    model = TextEmbedding(EMBEDDING_MODEL)
-    query_embedding = list(model.embed([query]))[0].tolist()
+def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 3) -> list[dict]: # DEFAULT_TOP_RESULTS
+    model = StaticModel.from_pretrained(EMBEDDING_MODEL)
+    query_embedding = model.encode([query])[0].tolist()
     # query() finds the top_k nearest neighbours to our query vector.
     # ChromaDB returns a dict with parallel lists: ids, distances, metadatas…
     raw = collection.query(
@@ -52,11 +50,14 @@ def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 10)
         include=["metadatas", "distances"],  # what fields to return alongside ids
     )
 
-    # raw["distances"][0] — ChromaDB returns cosine *distance* (0 = identical,
-    # 2 = opposite).  We convert to a 0-100 similarity score:
-    #   similarity = (1 - distance) * 100
-    # A distance of 0 → 100 %, distance of 1 → 0 %, distance > 1 → negative
-    # (clipped to 0 so we never show a negative score).
+    """
+        L2/cosine Algs:
+            raw["distances"][0] — ChromaDB returns cosine *distance* (0 = identical,
+            2 = opposite).  We convert to a 0-100 similarity score:
+            similarity = (1 - distance) * 100
+            A distance of 0 → 100 %, distance of 1 → 0 %, distance > 1 → negative
+            (clipped to 0 so we never show a negative score).
+    """
     results = []
     for doc_id, meta, dist in zip(
         raw["ids"][0],            # list of matched document ids
@@ -75,23 +76,13 @@ def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 10)
 
     return results
 
-
-# ---------------------------------------------------------------------------
-# Step 4 — Wire everything together
-# ---------------------------------------------------------------------------
-
 def build_semantic_engine() -> tuple[chromadb.Collection, None]:
-    # LOAD MOVIES FROM JSON
-    with open("movies.json", "r", encoding="utf-8") as f:
+    with open("movies.json", "r", encoding="utf-8") as f: # LOAD MOVIES FROM .JSON
         movies = json.load(f)
     client = chromadb.Client()
     collection = build_index(movies, client)
     return collection
 
-
-# ---------------------------------------------------------------------------
-# CLI — run this file directly to test without starting FastAPI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     col = build_semantic_engine()

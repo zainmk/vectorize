@@ -478,8 +478,10 @@
       body: JSON.stringify({ query }),
     };
 
-    const bm25Res = await fetch('/search', fetchOpts)
-    const semanticRes = await fetch('/semanticSearch', fetchOpts)
+    const [bm25Res, semanticRes] = await Promise.allSettled([
+      fetch('/search', fetchOpts),
+      fetch('/semanticsearch', fetchOpts),
+    ]);
 
     // BM25 column
     try {

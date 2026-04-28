@@ -1,5 +1,5 @@
 fastapi
 uvicorn
 chromadb
-fastembed
 aiofiles
+model2vec
