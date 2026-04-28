@@ -1,8 +1,9 @@
 import json
+import os
 import chromadb
 from model2vec import StaticModel
 
-EMBEDDING_MODEL = "minishlab/M2V_base_output"
+EMBEDDING_MODEL = os.path.join(os.path.dirname(__file__), "model")
 
 def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collection:
     """
