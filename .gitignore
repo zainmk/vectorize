@@ -2,4 +2,3 @@ __pycache__
 .claude
 .venv
 .vercel
-.env*.local
