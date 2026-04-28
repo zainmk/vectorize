@@ -6,21 +6,27 @@ import json
 import os
 import bm25
 import uvicorn
+from semantic import *
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    
     print('server init...')
-    print('cwd:', os.getcwd())
-    print('__file__:', __file__)
-    print('BASE_DIR:', BASE_DIR)
+
     global MOVIES
     global tok_data
+    global semantic_collection
+
     with open(os.path.join(BASE_DIR, 'movies.json')) as f:
         MOVIES = json.load(f)
     tok_data = bm25.build_index(MOVIES)
+
+    semantic_collection = build_semantic_engine()
+    
     yield
+
     print('server close...')
     pass
 
@@ -59,30 +65,12 @@ async def search(req: SearchRequest):
     return {"query": req.query, "results": results}
 
 
-
-# @app.post("/semantic-search")
-# async def search(req: SearchRequest):
-    
-#     if not req.query.strip():
-#         raise HTTPException(status_code=400, detail="Query cannot be empty")
-    
-#     # top = bm25.search(req.query, tok_data, MOVIES)[:5] # TOP 5 RESULTS
-#     # max_score = top[0][0] if top and top[0][0] > 0 else 1
-
-#     # results = [
-#     #     {
-#     #         "id": movie["id"],
-#     #         "title": movie["title"],
-#     #         "year": movie["year"],
-#     #         "genre": movie["genre"],
-#     #         "description": movie["description"],
-#     #         "similarity": round((score / max_score) * 100, 1),
-#     #     }
-#     #     for score, movie in top
-#     #     if score > 0
-#     # ]
-
-#     return {"query": req.query, "results": [] }
+@app.post("/semanticsearch")
+async def search(req: SearchRequest):
+    if not req.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+    res = semanticsearch(req.query, semantic_collection)
+    return {"query": req.query, "results": res }
 
 
 @app.get("/movies")

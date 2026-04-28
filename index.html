@@ -14,6 +14,8 @@
       --border: #2e2e3f;
       --accent: #7c6af5;
       --accent-dim: #4a418f;
+      --accent2: #f59e0b;
+      --accent2-dim: #78350f;
       --text: #e8e8f0;
       --text-dim: #888899;
       --green: #4ade80;
@@ -123,19 +125,55 @@
 
     .example-chip:hover { color: var(--accent); border-color: var(--accent); }
 
-    .results-meta {
-      max-width: 760px;
-      margin: 0 auto 1rem;
-      font-size: 0.85rem;
+    .results-columns {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 800px) {
+      .results-columns { grid-template-columns: 1fr; }
+    }
+
+    .results-col {}
+
+    .col-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .col-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    .col-label-bm25 {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .col-label-semantic {
+      background: var(--accent2-dim);
+      color: var(--accent2);
+    }
+
+    .col-meta {
+      font-size: 0.82rem;
       color: var(--text-dim);
       min-height: 1.2em;
     }
 
-    .results-meta strong { color: var(--text); }
+    .col-meta strong { color: var(--text); }
 
     .results {
-      max-width: 760px;
-      margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
@@ -327,9 +365,9 @@
 <body>
 
 <header>
-  <h1> vectorize | <span> Semantic Search </span></h1>
-  <p>Search 30 films by meaning — not keywords.<br>Powered by vector embeddings and cosine similarity.</p>
-  <span class="badge"> ChromaDB · all-MiniLM-L6-v2 · FastAPI </span>
+  <h1> vectorize | <span> Search Comparison </span></h1>
+  <p>Compare BM25 keyword search vs. semantic vector search across 30 films.<br>Powered via vector embeddings (chromaDB) and cosine similarity.</p>
+  <span class="badge"> BM25 · ChromaDB · all-MiniLM-L6-v2 · FastAPI </span>
 </header>
 
 <div class="search-box">
@@ -340,26 +378,29 @@
   <div class="examples">
     <span class="label" style="font-size:0.8rem;color:var(--text-dim);align-self:center;">try:</span>
     <span class="example-chip" onclick="setQuery(this)">love across social classes</span>
-    <span class="example-chip" onclick="setQuery(this)">terrifying creatures in the dark</span>
+    <span class="example-chip" onclick="setQuery(this)"> space </span>
     <span class="example-chip" onclick="setQuery(this)">escaping from a simulation</span>
-    <span class="example-chip" onclick="setQuery(this)">animated adventure for children</span>
-    <span class="example-chip" onclick="setQuery(this)">war and the loss of humanity</span>
-    <span class="example-chip" onclick="setQuery(this)">musician chasing perfection</span>
-    <span class="example-chip" onclick="setQuery(this)">post-apocalyptic survival</span>
     <span class="example-chip" onclick="setQuery(this)">AI and loneliness</span>
+    <span class="example-chip" onclick="setQuery(this)"> story </span>
   </div>
 </div>
 
-<div id="meta" class="results-meta"></div>
-<div id="results" class="results"></div>
-
-<!-- <div class="how-it-works">
-  <h3>How this works</h3>
-  <div class="step"><span class="step-num">1.</span><span>Each movie description is encoded into a 384-dimensional vector using <strong>sentence-transformers/all-MiniLM-L6-v2</strong> at startup.</span></div>
-  <div class="step"><span class="step-num">2.</span><span>Vectors are stored in a numpy float32 matrix — this is exactly what a vector database does under the hood. Embeddings are L2-normalised so cosine similarity reduces to a dot product.</span></div>
-  <div class="step"><span class="step-num">3.</span><span>Your query is embedded with the same model. ChromaDB finds the closest movie vectors using <strong>cosine similarity</strong> — capturing semantic meaning, not just word overlap.</span></div>
-  <div class="step"><span class="step-num">4.</span><span>Results are ranked by similarity score. Try queries that don't share words with any title or description to see semantic understanding in action.</span></div>
-</div> -->
+<div class="results-columns">
+  <div class="results-col">
+    <div class="col-header">
+      <span class="col-label col-label-bm25">BM25 · Keyword</span>
+      <span id="meta-bm25" class="col-meta"></span>
+    </div>
+    <div id="results-bm25" class="results"></div>
+  </div>
+  <div class="results-col">
+    <div class="col-header">
+      <span class="col-label col-label-semantic">Semantic · Vector</span>
+      <span id="meta-semantic" class="col-meta"></span>
+    </div>
+    <div id="results-semantic" class="results"></div>
+  </div>
+</div>
 
 <div class="data-section">
   <h2>Raw Dataset &nbsp;<span>30 movies</span></h2>
@@ -385,8 +426,10 @@
 
 <script>
   const input = document.getElementById('query');
-  const resultsEl = document.getElementById('results');
-  const metaEl = document.getElementById('meta');
+  const bm25El = document.getElementById('results-bm25');
+  const semanticEl = document.getElementById('results-semantic');
+  const metaBm25 = document.getElementById('meta-bm25');
+  const metaSemantic = document.getElementById('meta-semantic');
 
   input.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
 
@@ -402,49 +445,70 @@
     return 'sim-low';
   }
 
+  function renderCards(results, query) {
+    if (!results?.length) return '<div class="empty-state"><div class="icon">🎬</div><p>No results found.</p></div>';
+    return results.map((m, i) => `
+      <div class="card" style="animation-delay:${i * 0.05}s">
+        <div>
+          <div class="card-title">${escHtml(m.title)}</div>
+          <div class="card-meta">${m.year} &nbsp;·&nbsp; ${escHtml(m.genre)}</div>
+        </div>
+        <div class="similarity-badge ${simClass(m.similarity)}">${m.similarity}%</div>
+        <div class="card-desc">${highlightTerms(m.description, query)}</div>
+      </div>
+    `).join('');
+  }
+
   async function runSearch() {
     const query = input.value.trim();
-
     if (!query) return;
 
     const btn = document.getElementById('searchBtn');
     btn.disabled = true;
-    resultsEl.innerHTML = '<div class="loader"><span class="spinner"></span>Searching…</div>';
-    metaEl.innerHTML = '';
 
+    const loader = '<div class="loader"><span class="spinner"></span>Searching…</div>';
+    bm25El.innerHTML = loader;
+    semanticEl.innerHTML = loader;
+    metaBm25.innerHTML = '';
+    metaSemantic.innerHTML = '';
+
+    const fetchOpts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    };
+
+    // const [bm25Res, semanticRes] = await Promise.allSettled([
+    //   fetch('/search', fetchOpts),
+    //   fetch('/semanticsearch', fetchOpts),
+    // ]);
+
+    const bm25Res = await fetch('/search', fetchOpts)
+    const semanticRes = await fetch('/semanticSearch', fetchOpts)
+
+    // BM25 column
     try {
-      const res = await fetch('/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const data = await res.json();
-
-      if (!data.results?.length) {
-        resultsEl.innerHTML = '<div class="empty-state"><div class="icon">🎬</div><p>No results found.</p></div>';
-        return;
-      }
-
-      metaEl.innerHTML = `Top <strong>${data.results.length}</strong> matches for <strong>"${escHtml(data.query)}"</strong>`;
-
-      resultsEl.innerHTML = data.results.map((m, i) => `
-        <div class="card" style="animation-delay:${i * 0.05}s">
-          <div>
-            <div class="card-title">${escHtml(m.title)}</div>
-            <div class="card-meta">${m.year} &nbsp;·&nbsp; ${escHtml(m.genre)}</div>
-          </div>
-          <div class="similarity-badge ${simClass(m.similarity)}">${m.similarity}%</div>
-          <div class="card-desc">${highlightTerms(m.description, data.query)}</div>
-        </div>
-      `).join('');
-
+      if (bm25Res.status === 'rejected') throw new Error(bm25Res.reason);
+      if (!bm25Res.value.ok) throw new Error(`Server error ${bm25Res.value.status}`);
+      const data = await bm25Res.value.json();
+      metaBm25.innerHTML = `<strong>${data.results.length}</strong> matches`;
+      bm25El.innerHTML = renderCards(data.results, data.query);
     } catch (err) {
-      resultsEl.innerHTML = `<div class="loader" style="color:#f87171">Error: ${escHtml(err.message)}</div>`;
-    } finally {
-      btn.disabled = false;
+      bm25El.innerHTML = `<div class="loader" style="color:#f87171">Error: ${escHtml(err.message)}</div>`;
     }
+
+    // Semantic column
+    try {
+      if (semanticRes.status === 'rejected') throw new Error(semanticRes.reason);
+      if (!semanticRes.value.ok) throw new Error(`Server error ${semanticRes.value.status}`);
+      const data = await semanticRes.value.json();
+      metaSemantic.innerHTML = `<strong>${data.results.length}</strong> matches`;
+      semanticEl.innerHTML = renderCards(data.results, data.query);
+    } catch (err) {
+      semanticEl.innerHTML = `<div class="loader" style="color:#f87171">Error: ${escHtml(err.message)}</div>`;
+    }
+
+    btn.disabled = false;
   }
 
   function escHtml(s) {
