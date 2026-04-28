@@ -8,16 +8,15 @@ import uvicorn
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
-    print('STARTing UP...')
-
+    print('server init...')
     global MOVIES
     global tok_data
     with open('movies.json') as f:
         MOVIES = json.load(f)
     tok_data = bm25.build_index(MOVIES)
     yield
-    pass # no code to run on server shutdown
+    print('server close...')
+    pass
 
 app = FastAPI(lifespan=lifespan)
 
@@ -26,6 +25,11 @@ class SearchRequest(BaseModel):
 
 
 @app.get("/")
+async def index():
+    return 'hello world'
+
+
+@app.get("/app")
 async def index():
     return FileResponse("public/index.html") # serve the 'frontend' at base url
 
