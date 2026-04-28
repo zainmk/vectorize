@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 import json
@@ -34,13 +34,9 @@ class SearchRequest(BaseModel):
 async def index():
     return 'hello world'
 
-@app.get("/app")    
+@app.get("/app")
 async def serve_app():
-    # return FileResponse(os.path.join(BASE_DIR, "public/index.html"))
-    html_path = os.path.join(os.path.dirname(__file__), "../..", "public", "index.html")
-    with open(os.path.abspath(html_path)) as f:
-        return f.read()
-
+    return FileResponse(os.path.join(BASE_DIR, "public", "index.html"))
 
 @app.post("/search")
 async def search(req: SearchRequest):
