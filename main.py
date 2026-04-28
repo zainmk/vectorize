@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 import json
@@ -28,6 +29,7 @@ class SearchRequest(BaseModel):
 async def index():
     return 'hello world'
 
+app.mount("/public", StaticFiles(directory="public"), name="public")
 
 @app.get("/app")
 async def index():
