@@ -1,23 +1,8 @@
-"""
-semantic.py — ChromaDB-backed semantic search over the movies dataset.
-
-How it works at a high level:
-  1. Each movie's title + description is turned into a dense vector (embedding)
-     by a small sentence-transformer model running locally.
-  2. Those vectors are stored in a ChromaDB collection persisted to disk so
-     we only pay the embedding cost once.
-  3. At query time the user's query string is embedded the same way, and
-     ChromaDB finds the nearest movie vectors using cosine similarity.
-
-Dependencies:
-    pip install chromadb sentence-transformers
-"""
-
 import json
 import chromadb
-from sentence_transformers import SentenceTransformer # turns string into vectors
+from fastembed import TextEmbedding
 
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
 def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collection:
     """
@@ -32,10 +17,12 @@ def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collect
 
     print(f"[semantic] Embedding {len(movies)} movies with '{EMBEDDING_MODEL}'…")
 
-    model = SentenceTransformer(EMBEDDING_MODEL) # loading the model gets cached
-    texts = [f"{m['title']}. {m['description']}" for m in movies] # encode full data (title + desc.)
+    model = TextEmbedding(EMBEDDING_MODEL)
+    texts = [f"{m['title']}. {m['description']}" for m in movies]
 
-    embeddings = model.encode(texts, show_progress_bar=True).tolist()
+    embeddings = [e.tolist() for e in model.embed(texts)]
+
+
     ids = [str(m["id"]) for m in movies]
     metadatas = [
         {
@@ -55,8 +42,8 @@ def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collect
 # ---------------------------------------------------------------------------
 
 def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 10) -> list[dict]:
-    model = SentenceTransformer(EMBEDDING_MODEL)
-    query_embedding = model.encode([query])[0].tolist()
+    model = TextEmbedding(EMBEDDING_MODEL)
+    query_embedding = list(model.embed([query]))[0].tolist()
     # query() finds the top_k nearest neighbours to our query vector.
     # ChromaDB returns a dict with parallel lists: ids, distances, metadatas…
     raw = collection.query(

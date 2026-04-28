@@ -1,5 +1,5 @@
 fastapi
 uvicorn
 chromadb
-sentence_transformers
+fastembed
 aiofiles
