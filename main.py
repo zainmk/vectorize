@@ -30,13 +30,9 @@ class SearchRequest(BaseModel):
     query: str
 
 
-@app.get("/")
-async def index():
-    return 'hello world'
-
-@app.get("/app")
+@app.get("/") # FAST API ROUTE DECLARED FOR LOCAL DEV
 async def serve_app():
-    return FileResponse(os.path.join(BASE_DIR, "public", "index.html"))
+    return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
 @app.post("/search")
 async def search(req: SearchRequest):
