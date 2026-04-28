@@ -381,7 +381,7 @@
   </div>
 </div>
 
-<footer>30 films · embeddings computed locally · no external API calls</footer>
+<footer> questions?: zain.mk@hotmail.com </footer>
 
 <script>
   const input = document.getElementById('query');
@@ -470,7 +470,8 @@
   async function loadMoviesTable() {
     const tbody = document.getElementById('moviesTableBody');
     try {
-      const res = await fetch('movies.json');
+      
+      const res = await fetch('/movies'); // using relative paths
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const movies = await res.json();
       tbody.innerHTML = movies.map(m => `
