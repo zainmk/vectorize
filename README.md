@@ -1,4 +1,4 @@
-# vectorize
+# [vectorize](https://vector1ze.vercel.app/)
 'vectorize' data to enable semantic search via LLM's for RAG
 
 #### purpose
