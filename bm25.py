@@ -37,8 +37,3 @@ def search(query, tokenized_docs, original_docs, k1=1.5, b=0.75):
         scores.append((score, original_docs[i]))
 
     return sorted(scores, key=lambda x: x[0], reverse=True)
-
-# --- Search ---
-# results = bm25_search("space travel astronaut", corpus)
-# for score, movie in results[:5]:
-#     print(f"{score:.3f}  {movie['title']}")

@@ -36,14 +36,10 @@ def build_index(movies: list[dict], client: chromadb.Client) -> chromadb.Collect
     return collection
 
 
-# ---------------------------------------------------------------------------
-# Step 3 — Query
-# ---------------------------------------------------------------------------
-
 def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 3) -> list[dict]: # DEFAULT_TOP_RESULTS
     model = StaticModel.from_pretrained(EMBEDDING_MODEL)
     query_embedding = model.encode([query])[0].tolist()
-    # query() finds the top_k nearest neighbours to our query vector.
+
     # ChromaDB returns a dict with parallel lists: ids, distances, metadatas…
     raw = collection.query(
         query_embeddings=[query_embedding],  # list of query vectors (we have one)
@@ -51,7 +47,7 @@ def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 3) 
         include=["metadatas", "distances"],  # what fields to return alongside ids
     )
 
-    """
+    """   
         L2/cosine Algs:
             raw["distances"][0] — ChromaDB returns cosine *distance* (0 = identical,
             2 = opposite).  We convert to a 0-100 similarity score:
@@ -65,7 +61,7 @@ def semanticsearch(query: str, collection: chromadb.Collection, top_k: int = 3) 
         raw["metadatas"][0],      # list of metadata dicts
         raw["distances"][0],      # list of cosine distances
     ):
-        similarity = round(max(0.0, (1 - dist) * 100), 1)  # convert & clip
+        similarity = round(max(0.0, (1 - dist) * 100), 1)
         results.append({
             "id":          doc_id,
             "title":       meta["title"],
