@@ -22,7 +22,6 @@ async def lifespan(app: FastAPI):
     with open(os.path.join(BASE_DIR, 'movies.json')) as f:
         MOVIES = json.load(f)
     tok_data = bm25.build_index(MOVIES)
-
     semantic_collection = build_semantic_engine()
     
     yield
@@ -39,6 +38,7 @@ class SearchRequest(BaseModel):
 @app.get("/") # FAST API ROUTE DECLARED FOR LOCAL DEV
 async def serve_app():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
+
 
 @app.post("/search")
 async def search(req: SearchRequest):

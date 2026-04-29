@@ -366,13 +366,13 @@
 
 <header>
   <h1> vectorize | <span> Semantic Search Comparison </span></h1>
-  <p>We 'vectorize' the below movie data to apply both a keyword (BM25) & semantic based search.<br>Powered via vector embeddings (chromaDB) and cosine similarity.</p>
-  <span class="badge"> BM25 · ChromaDB · all-MiniLM-L6-v2 · FastAPI </span>
+  <p>We 'vectorize' the below movie data to apply both a keyword (BM25) & semantic based search.<br> We use a static embedding model [model2vec] to keep the application small & efficient.</p>
+  <span class="badge"> BM25 · ChromaDB · model2vec · FastAPI </span>
 </header>
 
 <div class="search-box">
   <div class="search-row">
-    <input id="query" type="text" placeholder="e.g. a man battles his inner demons, space survival…" autofocus />
+    <input id="query" type="text" placeholder="search for a keyword or contextual meaning" autofocus />
     <button id="searchBtn" onclick="runSearch()">Search</button>
   </div>
   <div class="examples">
@@ -380,7 +380,7 @@
     <span class="example-chip" onclick="setQuery(this)">love across social classes</span>
     <span class="example-chip" onclick="setQuery(this)"> space </span>
     <span class="example-chip" onclick="setQuery(this)">escaping from a simulation</span>
-    <span class="example-chip" onclick="setQuery(this)">AI and loneliness</span>
+    <span class="example-chip" onclick="setQuery(this)">not interstellar</span>
     <span class="example-chip" onclick="setQuery(this)"> story </span>
   </div>
 </div>
