@@ -366,7 +366,7 @@
 
 <header>
   <h1> vectorize | <span> Semantic Search Comparison </span></h1>
-  <p>Compare BM25 keyword search vs. semantic vector search.<br>Powered via vector embeddings (chromaDB) and cosine similarity.</p>
+  <p>We 'vectorize' the below movie data to apply both a keyword (BM25) & semantic based search.<br>Powered via vector embeddings (chromaDB) and cosine similarity.</p>
   <span class="badge"> BM25 · ChromaDB · all-MiniLM-L6-v2 · FastAPI </span>
 </header>
 
@@ -387,14 +387,14 @@
 
 <div class="results-columns">
   <div class="results-col">
-    <div class="col-header">
+    <div id="header-bm25" class="col-header" style="display:none">
       <span class="col-label col-label-bm25">BM25 · Keyword</span>
       <span id="meta-bm25" class="col-meta"></span>
     </div>
     <div id="results-bm25" class="results"></div>
   </div>
   <div class="results-col">
-    <div class="col-header">
+    <div id="header-semantic" class="col-header" style="display:none">
       <span class="col-label col-label-semantic">Semantic · Vector</span>
       <span id="meta-semantic" class="col-meta"></span>
     </div>
@@ -488,9 +488,12 @@
       if (bm25Res.status === 'rejected') throw new Error(bm25Res.reason);
       if (!bm25Res.value.ok) throw new Error(`Server error ${bm25Res.value.status}`);
       const data = await bm25Res.value.json();
+      const hasBm25 = data.results?.length > 0;
+      document.getElementById('header-bm25').style.display = hasBm25 ? '' : 'none';
       metaBm25.innerHTML = `<strong>${data.results.length}</strong> matches`;
       bm25El.innerHTML = renderCards(data.results, data.query);
     } catch (err) {
+      document.getElementById('header-bm25').style.display = 'none';
       bm25El.innerHTML = `<div class="loader" style="color:#f87171">Error: ${escHtml(err.message)}</div>`;
     }
 
@@ -499,9 +502,12 @@
       if (semanticRes.status === 'rejected') throw new Error(semanticRes.reason);
       if (!semanticRes.value.ok) throw new Error(`Server error ${semanticRes.value.status}`);
       const data = await semanticRes.value.json();
+      const hasSemantic = data.results?.length > 0;
+      document.getElementById('header-semantic').style.display = hasSemantic ? '' : 'none';
       metaSemantic.innerHTML = `<strong>${data.results.length}</strong> matches`;
       semanticEl.innerHTML = renderCards(data.results, data.query);
     } catch (err) {
+      document.getElementById('header-semantic').style.display = 'none';
       semanticEl.innerHTML = `<div class="loader" style="color:#f87171">Error: ${escHtml(err.message)}</div>`;
     }
 
