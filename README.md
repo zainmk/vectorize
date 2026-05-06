@@ -1,5 +1,5 @@
 # [vectorize](https://vector1ze.vercel.app/)
-'vectorize' data to enable semantic search via LLM's for RAG
+'vectorize' data to enable semantic search via sentence-transformers
 
 #### purpose
 the purpose of this application is to explore the use of 'vector databases' and [RAG based semantic search](https://www.youtube.com/watch?v=JB2P5Gk23VI). Transforming multimodal data into vector embeddings, allows for much more accurate and possible 'semantic search'. We can use this for RAG tools, where a specific documented reference is required. This can be useful to cater AI outputs as per controlled 'input' documentations.
