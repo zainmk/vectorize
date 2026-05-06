@@ -2,7 +2,7 @@
 'vectorize' data to enable semantic search via sentence-transformers
 
 #### purpose
-the purpose of this application is to explore the use of 'vector databases' and [RAG based semantic search](https://www.youtube.com/watch?v=JB2P5Gk23VI). Transforming multimodal data into vector embeddings, allows for much more accurate and possible 'semantic search'. We can use this for RAG tools, where a specific documented reference is required. This can be useful to cater AI outputs as per controlled 'input' documentations.
+the purpose of this application is to explore the use of 'vector databases'. Transforming multimodal data into vector embeddings, allows for much more accurate and possible contextual based 'semantic search'. This project compares these search methods (semantic vs. BM25) and how each still proves its use side by side. These tools are used w.in the RAG pipeline.
 
 #### tools & algs
 - BM25 (Best-Matching 25): Commonly currently used to query search results against a database. Tokenizes the 'strings' (title, description) / documents as per term frequency, inverse document frequency, and document length normalization. This search alg. is limited by being incapable of producing results that do not include the original search query 'strings'.
@@ -11,9 +11,7 @@ the purpose of this application is to explore the use of 'vector databases' and 
 
 
 #### [model2vec](https://pypi.org/project/model2vec/0.3.7/)
-the `sentence-transformers` lib is typically used to model the data and encode the search queries. To deploy via vercel however, the total deployed size is limited to 500MB ~ sentence-transformers requires PyTorch which exceeds that file size.
-
-We use a lightweight alternative, `model2vec` and instead use a generated pretrained model (less 'contextual' performance between the input's themselves) that is saved locally, but is smaller and faster. On server initialization, we use the pretrained model to encode the dataset of 30 movies into vector embeddings, and then do the same to the search queries to evaluate the 'closest' ones. 
+the `sentence-transformers` lib is typically used to embed the data and query. To deploy via Vercel however, the total deployed size is limited to 500MB ~ sentence-transformers requires PyTorch which exceeds that file size. To reduce the total size of the application, we use a distilled static model, locally saved, to encode our dataset. The search queries are instead tokenized, mapped to a static embedding table, then scores averaged out to find the best answer. This  allows for a more lightweight application, but restricts the response to not have 'self attention' and vectorize the query itself for semantic understanding (ex. asking for 'a movie that has nothing to do with space', will not work as the 'in-query' understanding of 'not-space' won't be contextually picked up)
 
 Upgrading to sentence-transformers and using 'contextual' embedding models instead of static, is worth the overhead when...
 - queries are lingusiticly complex
