@@ -2,7 +2,7 @@
 'vectorize' data to enable semantic search via LLM's for RAG
 
 #### purpose
-the purpose of this application is to explore the use of 'vector databases' and [RAG based semantic search](https://www.youtube.com/watch?v=JB2P5Gk23VI&t=304s). Transforming multimodal data into vector embeddings, allows for much more accurate and possible 'semantic search'. We can use this for RAG tools, where a specific documented reference is required. This can be useful to cater AI outputs as per controlled 'input' documentations.
+the purpose of this application is to explore the use of 'vector databases' and [RAG based semantic search](https://www.youtube.com/watch?v=JB2P5Gk23VI). Transforming multimodal data into vector embeddings, allows for much more accurate and possible 'semantic search'. We can use this for RAG tools, where a specific documented reference is required. This can be useful to cater AI outputs as per controlled 'input' documentations.
 
 #### tools & algs
 - BM25 (Best-Matching 25): Commonly currently used to query search results against a database. Tokenizes the 'strings' (title, description) / documents as per term frequency, inverse document frequency, and document length normalization. This search alg. is limited by being incapable of producing results that do not include the original search query 'strings'.
